@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            background: url('{{ url_for('static', filename='custom_bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .animation-container {
+            flex: 1;
+            text-align: center;
+        }
+
+        #bank-logo-animation {
+            width: 150px;
+            height: 150px;
+        }
+
+        .form-container {
+            flex: 3;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .result p {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .churn {
+            color: red;
+        }
+
+        .no-churn {
+            color: green;
+        }
+
+        button {
+            padding: 12px;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="animation-container">
+            <div id="bank-logo-animation"></div>
+        </div>
+        <div class="form-container">
+            <h1>Prediction Result</h1>
+            <div class="result">
+                {% if prediction == 1 %}
+                    <p class="churn">The customer is likely to churn.</p>
+                {% else %}
+                    <p class="no-churn">The customer is not likely to churn.</p>
+                {% endif %}
+            </div>
+            <form action="/">
+                <button type="submit">Go Back</button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js"></script>
+    <script>
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('bank-logo-animation'), // the DOM element to contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{{ url_for("static", filename="bank_logo.json") }}' // the path to the animation json
+        });
+    </script>
+</body>
+</html>

@@ -1,55 +1,47 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import pickle
 import numpy as np
 
 app = Flask(__name__)
 
-# Load your trained model (replace 'model.pkl' with your model file)
-model = pickle.load(open('model.pkl', 'rb'))
+svc_model = pickle.load(open('svc_model.pkl', 'rb'))
+logistic_model = pickle.load(open('logistic_model.pkl', 'rb'))
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
-def predict_churn():
+def predict():
     try:
-        # Get input values from the form
-        credit_product_count = float(request.form.get('credit-product-count', 0))
-        turnover_payment = float(request.form.get('turnover-payment', 0))
-        credit_card_count = float(request.form.get('credit-card-count', 0))
-        transaction_count_supermarket = float(request.form.get('transaction-count-supermarket', 0))
-        turnover_dynamic_cur_1m = float(request.form.get('turnover-dynamic-cur-1m', 0))
-        turnover_dynamic_cur_3m = float(request.form.get('turnover-dynamic-cur-3m', 0))
-        client_setup_tenure = float(request.form.get('client-setup-tenure', 0))
-        rest_average_current = float(request.form.get('rest-average-current', 0))
-        credit_product_count_tovr = float(request.form.get('credit-product-count-tovr', 0))
-        rest_average_payment = float(request.form.get('rest-average-payment', 0))
+        Feature1 = float(request.form['CR_PROD_CNT_IL'])
+        Feature2 = float(request.form['TURNOVER_PAYM'])
+        Feature3 = float(request.form['CR_PROD_CNT_CC'])
+        Feature4 = float(request.form['TRANS_COUNT_SUP_PRC'])
+        Feature5 = float(request.form['TURNOVER_DYNAMIC_CUR_1M'])
+        Feature6 = float(request.form['TURNOVER_DYNAMIC_CUR_3M'])
+        Feature7 = float(request.form['CLNT_SETUP_TENOR'])
+        Feature8 = float(request.form['REST_AVG_CUR'])
+        Feature9 = float(request.form['CR_PROD_CNT_TOVR'])
+        Feature10 = float(request.form['REST_AVG_PAYM'])
 
-        # Create a feature array for prediction
-        features = np.array([[credit_product_count, turnover_payment, credit_card_count,
-                              transaction_count_supermarket, turnover_dynamic_cur_1m,
-                              turnover_dynamic_cur_3m, client_setup_tenure, rest_average_current,
-                              credit_product_count_tovr, rest_average_payment] +
-                             [0] * (36 - 10)])  # Fill remaining features with zeros
-
-        # Make a prediction
-        prediction = model.predict(features)
-
-        # Determine the result and color
-        if prediction[0] == 1:
-            result = 'The customer is likely to churn.'
-            color = 'green'
+        model_option = request.form['model_option']
+        
+        placeholder_features = [0] * (59 - 10)
+        features = np.array([[Feature1, Feature2, Feature3, Feature4, Feature5,
+                              Feature6, Feature7, Feature8, Feature9, Feature10] + placeholder_features])
+        
+        if model_option == 'SVC Model':
+            model = svc_model
         else:
-            result = 'The customer is not likely to churn.'
-            color = 'red'
+            model = logistic_model
 
+        prediction = model.predict(features)
+        prediction_text = 'The customer is likely to churn.' if prediction[0] == 1 else 'The customer is not likely to churn.'
+
+        return render_template('result.html', prediction=prediction_text)
     except Exception as e:
-        result = 'Error: ' + str(e)
-        color = 'orange'  # You can choose a different color for error messages
-
-    return render_template('index.html', result=result, color=color)
-
+        return str(e)
 
 if __name__ == '__main__':
     app.run(debug=True)

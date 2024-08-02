@@ -5,107 +5,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bank Churn Prediction</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-            border-radius: 5px;
+            background: url('{{ url_for('static', filename='custom_bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        h1, h2 {
+
+        .container {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .animation-container {
+            flex: 1;
+            text-align: center;
+        }
+
+        #bank-logo-animation {
+            width: 150px;
+            height: 150px;
+        }
+
+        .form-container {
+            flex: 3;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
             color: #333;
         }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label, select, button, input {
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
         label {
-            display: block;
-            margin-top: 15px;
+            font-weight: 500;
+            color: #555;
         }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        select, input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
+
         button {
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #28a745;
+            padding: 12px;
+            border-radius: 5px;
+            background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
+            font-weight: 500;
         }
+
         button:hover {
-            background-color: #218838;
-        }
-        .result {
-            margin-top: 20px;
-            font-weight: bold;
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-
-    <h1>Bank Churn Prediction</h1>
-    {% if result %}
-    <div class="result" style="color: {{ color }}">{{ result }}</div>
-    {% endif %}
-
-
-    <form id="prediction-form" action="/predict" method="post">
-        <h2>Select Model:</h2>
-        <select id="model-option" name="model-option">
-            <option value="svc">SVC Model</option>
-            <option value="logistic">Logistic Model</option>
-        </select>
-
-        <h2 id="model-features-title">SVC Model Features</h2>
-
-        <label for="credit-product-count">Credit Product Count (IL):</label>
-        <input type="number" id="credit-product-count" name="credit-product-count" step="0.01" placeholder="Enter Credit Product Count (IL)">
-
-        <label for="turnover-payment">Turnover Payment:</label>
-        <input type="number" id="turnover-payment" name="turnover-payment" step="0.01" placeholder="Enter Turnover Payment">
-
-        <label for="credit-card-count">Credit Card Count:</label>
-        <input type="number" id="credit-card-count" name="credit-card-count" step="0.01" placeholder="Enter Credit Card Count">
-
-        <label for="transaction-count-supermarket">Transaction Count (Supermarket):</label>
-        <input type="number" id="transaction-count-supermarket" name="transaction-count-supermarket" step="0.01" placeholder="Enter Transaction Count (Supermarket)">
-
-        <label for="turnover-dynamic-cur-1m">Turnover Dynamic (Current 1 Month):</label>
-        <input type="number" id="turnover-dynamic-cur-1m" name="turnover-dynamic-cur-1m" step="0.01" placeholder="Enter Turnover Dynamic (Current 1 Month)">
-
-        <label for="turnover-dynamic-cur-3m">Turnover Dynamic (Current 3 Months):</label>
-        <input type="number" id="turnover-dynamic-cur-3m" name="turnover-dynamic-cur-3m" step="0.01" placeholder="Enter Turnover Dynamic (Current 3 Months)">
-
-        <label for="client-setup-tenure">Client Setup Tenure:</label>
-        <input type="number" id="client-setup-tenure" name="client-setup-tenure" step="0.01" placeholder="Enter Client Setup Tenure">
-
-        <label for="rest-average-current">Rest Average (Current):</label>
-        <input type="number" id="rest-average-current" name="rest-average-current" step="0.01" placeholder="Enter Rest Average (Current)">
-
-        <label for="credit-product-count-tovr">Credit Product Count (TOVR):</label>
-        <input type="number" id="credit-product-count-tovr" name="credit-product-count-tovr" step="0.01" placeholder="Enter Credit Product Count (TOVR)">
-
-        <label for="rest-average-payment">Rest Average (Payment):</label>
-        <input type="number" id="rest-average-payment" name="rest-average-payment" step="0.01" placeholder="Enter Rest Average (Payment)">
-
-        <button type="submit">Predict</button>
-    </form>
-
-   
+    <div class="container">
+        <div class="animation-container">
+            <div id="bank-logo-animation"></div>
+        </div>
+        <div class="form-container">
+            <h1>Bank Churn Prediction</h1>
+            <form action="/predict" method="post">
+                <div>
+                    <label for="model_option"><strong>Select Model</strong></label>
+                    <select id="model_option" name="model_option">
+                        <option value="SVC Model">SVC Model</option>
+                        <option value="Logistic Model">Logistic Model</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="CR_PROD_CNT_IL"><strong>CR_PROD_CNT_IL</strong></label>
+                    <input type="number" id="CR_PROD_CNT_IL" name="CR_PROD_CNT_IL" step="any" required>
+                </div>
+                <div>
+                    <label for="TURNOVER_PAYM"><strong>TURNOVER_PAYM</strong></label>
+                    <input type="number" id="TURNOVER_PAYM" name="TURNOVER_PAYM" step="any" required>
+                </div>
+                <div>
+                    <label for="CR_PROD_CNT_CC"><strong>CR_PROD_CNT_CC</strong></label>
+                    <input type="number" id="CR_PROD_CNT_CC" name="CR_PROD_CNT_CC" step="any" required>
+                </div>
+                <div>
+                    <label for="TRANS_COUNT_SUP_PRC"><strong>TRANS_COUNT_SUP_PRC</strong></label>
+                    <input type="number" id="TRANS_COUNT_SUP_PRC" name="TRANS_COUNT_SUP_PRC" step="any" required>
+                </div>
+                <div>
+                    <label for="TURNOVER_DYNAMIC_CUR_1M"><strong>TURNOVER_DYNAMIC_CUR_1M</strong></label>
+                    <input type="number" id="TURNOVER_DYNAMIC_CUR_1M" name="TURNOVER_DYNAMIC_CUR_1M" step="any" required>
+                </div>
+                <div>
+                    <label for="TURNOVER_DYNAMIC_CUR_3M"><strong>TURNOVER_DYNAMIC_CUR_3M</strong></label>
+                    <input type="number" id="TURNOVER_DYNAMIC_CUR_3M" name="TURNOVER_DYNAMIC_CUR_3M" step="any" required>
+                </div>
+                <div>
+                    <label for="CLNT_SETUP_TENOR"><strong>CLNT_SETUP_TENOR</strong></label>
+                    <input type="number" id="CLNT_SETUP_TENOR" name="CLNT_SETUP_TENOR" step="any" required>
+                </div>
+                <div>
+                    <label for="REST_AVG_CUR"><strong>REST_AVG_CUR</strong></label>
+                    <input type="number" id="REST_AVG_CUR" name="REST_AVG_CUR" step="any" required>
+                </div>
+                <div>
+                    <label for="CR_PROD_CNT_TOVR"><strong>CR_PROD_CNT_TOVR</strong></label>
+                    <input type="number" id="CR_PROD_CNT_TOVR" name="CR_PROD_CNT_TOVR" step="any" required>
+                </div>
+                <div>
+                    <label for="REST_AVG_PAYM"><strong>REST_AVG_PAYM</strong></label>
+                    <input type="number" id="REST_AVG_PAYM" name="REST_AVG_PAYM" step="any" required>
+                </div>
+                <button type="submit"><strong>Predict</strong></button>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.5/lottie.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
-        // Change input fields based on selected model
-        document.getElementById('model-option').addEventListener('change', function () {
-            const modelFeaturesTitle = document.getElementById('model-features-title');
-            if (this.value === 'logistic') {
-                modelFeaturesTitle.textContent = 'Logistic Model Features';
-            } else {
-                modelFeaturesTitle.textContent = 'SVC Model Features';
-            }
+        var animation = lottie.loadAnimation({
+            container: document.getElementById('bank-logo-animation'), // the DOM element to contain the animation
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: '{{ url_for("static", filename="bank_logo.json") }}' // the path to the animation json
         });
     </script>
-
 </body>
 </html>
